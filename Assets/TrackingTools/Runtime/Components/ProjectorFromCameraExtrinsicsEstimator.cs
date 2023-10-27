@@ -35,6 +35,8 @@ namespace TrackingTools
 		[SerializeField] Texture _cameraSourceTexture = null;
 		[SerializeField,ReadOnlyAtRuntime] string _cameraIntrinsicsFileName = "DefaultCamera";
 		[SerializeField] ProjectorCheckerboard _projectorCheckerboard = null;
+		[SerializeField, Range(0, 2)] float contrast = 1;
+		[SerializeField, Range(-127, 127)] float brightness = 0;
 		[SerializeField] bool _flipCameraTextureVertically = false;
 		[SerializeField,ReadOnlyAtRuntime] OperationMode _operationMode = OperationMode.TimedSampling;
 
@@ -532,6 +534,9 @@ namespace TrackingTools
 			// Convert texture to mat (if the texture looks right in Unity, then it needs to be flipped for OpenCV).
 			TrackingToolsHelper.TextureToMat( _cameraSourceTexture, !_flipCameraTextureVertically, ref _camTexMat, ref _tempTransferColors, ref _tempTransferTexture );
 
+			// Adjust contrast and brightness, which can improve the image for finding the circle grid
+			Core.convertScaleAbs(_camTexMat, _camTexMat, contrast, brightness);
+			
 			// Convert to grayscale if more than one channel, else copy (and convert bit rate if necessary).
 			TrackingToolsHelper.ColorMatToLumanceMat( _camTexMat, _camTexGrayMat );
 
